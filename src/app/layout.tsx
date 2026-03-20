@@ -6,6 +6,8 @@ export const metadata: Metadata = {
   description: "AI-powered health, fitness, and nutrition optimization",
 };
 
+import { Navigation } from "@/components/navigation";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -13,7 +15,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <div className="sticky-nav">
+          <div className="container">
+            <Navigation />
+          </div>
+        </div>
+        {children}
+      </body>
     </html>
   );
 }

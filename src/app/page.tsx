@@ -6,10 +6,12 @@ import { CTA } from "@/components/home/cta";
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-black text-white">
-      <Hero />
-      <FeatureGrid />
-      <HowItWorks />
-      <CTA />
+      <div className="space-y-24 py-24">
+        <Hero />
+        <FeatureGrid />
+        <HowItWorks />
+        <CTA />
+      </div>
     </main>
   );
 }
