@@ -2,23 +2,32 @@ import { Hero } from "@/components/home/hero";
 import { FeatureGrid } from "@/components/home/feature-grid";
 import { HowItWorks } from "@/components/home/how-it-works";
 import { CTA } from "@/components/home/cta";
-import { getLatestPlan } from "@/lib/supabase/api";
+import { getLatestPlan, initializeUser } from "@/lib/supabase/api";
 import { useEffect, useState } from "react";
 
 export default function HomePage() {
-  const [plan, setPlan] = useState(null);
+  const [plan, setPlan] = useState<Plan | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    // For now using localStorage ID as temp user ID
-    const userId = localStorage.getItem('userId') || crypto.randomUUID();
-    if (!localStorage.getItem('userId')) {
-      localStorage.setItem('userId', userId);
+    async function initialize() {
+      let userId = localStorage.getItem('userId');
+      if (!userId) {
+        userId = await initializeUser();
+        localStorage.setItem('userId', userId);
+      }
+      setUserId(userId);
     }
+
+    initialize();
+  }, []);
+
+  useEffect(() => {
+    if (!userId) return;
 
     async function loadPlan() {
       const latestPlan = await getLatestPlan(userId);
       if (!latestPlan) {
-        // Fallback to mock data
         console.log('No plan found, using default data');
         return;
       }
@@ -26,7 +35,7 @@ export default function HomePage() {
     }
 
     loadPlan();
-  }, []);
+  }, [userId]);
 
   return (
     <main className="min-h-screen bg-black text-white">

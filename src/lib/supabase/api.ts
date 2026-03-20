@@ -1,7 +1,19 @@
 import { supabase } from './client'
-import { Profile, Plan } from './types'
+import { Profile, Plan, UserSession } from './types'
 
-export async function saveProfile(profile: Omit<Profile, 'id'|'created_at'>) {
+export async function initializeUser(): Promise<string> {
+  const userId = crypto.randomUUID()
+  const { data, error } = await supabase
+    .from('user_sessions')
+    .insert({ id: userId })
+    .select()
+    .single()
+
+  if (error) console.error('Error initializing user:', error)
+  return userId
+}
+
+export async function saveProfile(profile: Omit<Profile, 'id'|'created_at'|'updated_at'>) {
   const { data, error } = await supabase
     .from('profiles')
     .insert(profile)
@@ -12,7 +24,7 @@ export async function saveProfile(profile: Omit<Profile, 'id'|'created_at'>) {
   return data
 }
 
-export async function savePlan(plan: Omit<Plan, 'id'|'created_at'>) {
+export async function savePlan(plan: Omit<Plan, 'id'|'created_at'|'updated_at'>) {
   const { data, error } = await supabase
     .from('plans')
     .insert(plan)
@@ -23,7 +35,7 @@ export async function savePlan(plan: Omit<Plan, 'id'|'created_at'>) {
   return data
 }
 
-export async function getLatestPlan(userId: string) {
+export async function getLatestPlan(userId: string): Promise<Plan | null> {
   const { data, error } = await supabase
     .from('plans')
     .select('*')
@@ -32,6 +44,23 @@ export async function getLatestPlan(userId: string) {
     .limit(1)
     .single()
 
-  if (error) console.error('Error getting plan:', error)
+  if (error) {
+    console.error('Error getting plan:', error)
+    return null
+  }
+  return data
+}
+
+export async function getUserProfile(userId: string): Promise<Profile | null> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('user_id', userId)
+    .single()
+
+  if (error) {
+    console.error('Error getting profile:', error)
+    return null
+  }
   return data
 }

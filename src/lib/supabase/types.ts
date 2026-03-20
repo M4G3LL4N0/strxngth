@@ -1,5 +1,6 @@
 export type Profile = {
   id: string
+  user_id: string
   name: string
   email: string
   age: number
@@ -8,13 +9,21 @@ export type Profile = {
   fitness_level: string
   goals: string[]
   created_at: string
+  updated_at: string
 }
 
 export type Plan = {
   id: string
-  user_id: string 
+  user_id: string
   name: string
   workouts: string[]
   duration_weeks: number
   created_at: string
+  updated_at: string
+}
+
+export type UserSession = {
+  id: string
+  created_at: string
+  last_active_at: string
 }
