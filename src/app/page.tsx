@@ -8,19 +8,19 @@ import { useEffect, useState } from "react";
 export default function HomePage() {
   const [plan, setPlan] = useState<Plan | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [session, setSession] = useState<AuthSession | null>(null);
 
   useEffect(() => {
-    async function initialize() {
-      let userId = localStorage.getItem('userId');
-      if (!userId) {
-        userId = await initializeUser();
-        localStorage.setItem('userId', userId);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setSession(session)
+      if (session?.user?.id) {
+        setUserId(session.user.id)
+        localStorage.setItem('userId', session.user.id)
       }
-      setUserId(userId);
-    }
+    })
 
-    initialize();
-  }, []);
+    return () => subscription.unsubscribe()
+  }, [])
 
   useEffect(() => {
     if (!userId) return;
@@ -33,9 +33,17 @@ export default function HomePage() {
       }
       setPlan(latestPlan);
     }
-
+    
     loadPlan();
   }, [userId]);
+
+  const handleSignIn = async () => {
+    if (!session) {
+      window.location.href = '/auth'
+      return
+    }
+    window.location.href = '/onboarding'
+  }
 
   return (
     <main className="min-h-screen bg-black text-white">

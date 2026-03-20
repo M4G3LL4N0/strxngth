@@ -51,6 +51,26 @@ export async function getLatestPlan(userId: string): Promise<Plan | null> {
   return data
 }
 
+export async function signInWithEmail(email: string, password?: string) {
+  const { data, error } = password
+    ? await supabase.auth.signInWithPassword({ email, password })
+    : await supabase.auth.signInWithOtp({ email })
+
+  if (error) throw error
+  return data
+}
+
+export async function signOut() {
+  const { error } = await supabase.auth.signOut()
+  if (error) throw error
+}
+
+export async function getSession() {
+  const { data, error } = await supabase.auth.getSession()
+  if (error) throw error
+  return data.session
+}
+
 export async function getUserProfile(userId: string): Promise<Profile | null> {
   const { data, error } = await supabase
     .from('profiles')

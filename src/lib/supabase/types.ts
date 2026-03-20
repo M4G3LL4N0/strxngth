@@ -27,3 +27,14 @@ export type UserSession = {
   created_at: string
   last_active_at: string
 }
+
+export type AuthSession = {
+  access_token: string
+  token_type: string
+  expires_in: number
+  refresh_token: string
+  user: {
+    id: string
+    email: string
+  }
+}
