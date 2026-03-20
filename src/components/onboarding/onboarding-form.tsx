@@ -53,9 +53,16 @@ export function OnboardingForm() {
       if (data?.plan) {
         localStorage.setItem("strxngth_plan", JSON.stringify(data.plan));
         localStorage.setItem("strxngth_profile", JSON.stringify(form));
+        await toast.promise(
+          saveProfile(form),
+          {
+            loading: 'Saving your profile...',
+            success: 'Profile saved successfully',
+            error: 'Error saving profile',
+          }
+        );
+        router.push("/dashboard?new_plan=true");
       }
-
-      router.push("/dashboard");
     } catch (error) {
       console.error(error);
       router.push("/dashboard");

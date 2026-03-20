@@ -6,7 +6,9 @@ export const metadata: Metadata = {
   description: "AI-powered health, fitness, and nutrition optimization",
 };
 
-import { Navigation } from "@/components/navigation";
+import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
+import { Toaster } from "@/components/toaster";
 
 export default function RootLayout({
   children,
@@ -15,13 +17,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
-        <div className="sticky-nav">
-          <div className="container">
-            <Navigation />
-          </div>
-        </div>
-        {children}
+      <body className="bg-black text-white antialiased">
+        <Navbar />
+        <main className="min-h-screen">
+          {children}
+        </main>
+        <Footer />
+        <Toaster />
       </body>
     </html>
   );
