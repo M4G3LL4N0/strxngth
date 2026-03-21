@@ -3,9 +3,11 @@
 :root {
   color-scheme: dark;
   --max-width: 1440px;
-  --border-radius: 12px;
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  --border-radius: 16px;
+  --border-radius-sm: 12px;
+  --glass-bg: rgba(255, 255, 255, 0.07);
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --transition: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {
@@ -24,7 +26,23 @@ body {
 }
 
 body {
-  background: radial-gradient(circle at top, rgba(255,255,255,0.02), transparent 35%);
+  background: 
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255, 255, 255, 0.03), transparent),
+    radial-gradient(ellipse 100% 100% at 50% 0%, rgba(255, 255, 255, 0.015), transparent);
+  background-color: #000;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  animation: fadeIn 1s var(--transition);
 }
 
 a {

@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Strxngth",
-  description: "AI-powered health, fitness, and nutrition optimization",
+  title: "Strxngth | AI Performance System",
+  description: "The elite AI system for training, nutrition, and execution. Built for consistent results, not fantasy metrics.",
+  keywords: ["fitness", "training", "nutrition", "AI coach", "workout plan", "meal plan"],
 };
 
 import { Navbar } from "@/components/navbar";
