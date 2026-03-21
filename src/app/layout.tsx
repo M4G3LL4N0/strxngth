@@ -2,9 +2,27 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Strxngth | AI Performance System",
-  description: "The elite AI system for training, nutrition, and execution. Built for consistent results, not fantasy metrics.",
-  keywords: ["fitness", "training", "nutrition", "AI coach", "workout plan", "meal plan"],
+  title: "Strxngth | Elite Performance System",
+  description: "The AI-powered system for elite training, precision nutrition, and consistent execution. Built for real results, not fantasy metrics.",
+  keywords: ["fitness", "training", "nutrition", "AI coach", "workout plan", "meal plan", "performance"],
+  openGraph: {
+    title: "Strxngth | Elite Performance System",
+    description: "The AI-powered system for elite training, precision nutrition, and consistent execution.",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Strxngth",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Strxngth | Elite Performance System",
+    description: "The AI-powered system for elite training, precision nutrition, and consistent execution.",
+    images: ["/og-image.jpg"],
+  },
 };
 
 import { Navbar } from "@/components/navbar";

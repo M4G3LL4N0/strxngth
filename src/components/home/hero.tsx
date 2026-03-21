@@ -3,20 +3,20 @@ import { Button } from "@/components/ui/button";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden px-6 py-32 md:px-10 md:py-40">
+    <section className="relative overflow-hidden px-6 py-40 md:px-10 md:py-48">
       <div className="container mx-auto grid grid-cols-1 gap-16 md:grid-cols-2">
-        <div className="flex flex-col justify-center">
-          <div className="mb-4 inline-flex rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-white/70">
+        <div className="flex flex-col justify-center space-y-8">
+          <div className="inline-flex rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-white/80">
             Elite Performance System
           </div>
           <h1 className="text-5xl font-semibold tracking-tight text-white md:text-6xl lg:text-7xl">
             Precision training,<br />
             built for <span className="text-white/90">real execution</span>.
           </h1>
-          <p className="mt-6 max-w-xl text-lg leading-8 text-white/80">
+          <p className="max-w-xl text-lg leading-8 text-white/80">
             Strxngth combines AI-powered workout programming, precision nutrition, and behavioral accountability into one seamless system.
           </p>
-          <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
             <Link href="/onboarding">
               <Button className="w-full sm:w-auto" size="lg">
                 Build Your Plan
@@ -24,7 +24,7 @@ export function Hero() {
             </Link>
             <Link
               href="/dashboard"
-              className="text-sm font-medium text-white/70 underline-offset-4 hover:text-white hover:underline"
+              className="text-sm font-medium text-white/80 underline-offset-4 hover:text-white hover:underline"
             >
               See dashboard →
             </Link>
