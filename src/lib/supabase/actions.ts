@@ -2,8 +2,14 @@ import { supabase } from './client'
 import type { OnboardingData, GeneratedPlan } from '@/lib/types'
 
 export async function getCurrentUser() {
-  const { data: { user } } = await supabase.auth.getUser()
-  return user
+  const { data: { user }, error } = await supabase.auth.getUser();
+  
+  if (error) {
+    console.error("Error getting user:", error);
+    return null;
+  }
+  
+  return user;
 }
 
 export async function upsertProfile(profile: OnboardingData) {

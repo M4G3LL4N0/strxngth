@@ -1,6 +1,8 @@
 import { OnboardingForm } from "@/components/onboarding/onboarding-form";
+import { getCurrentUser } from "@/lib/supabase/actions";
 
-export default function OnboardingPage() {
+export default async function OnboardingPage() {
+  const user = await getCurrentUser();
   return (
     <main className="min-h-screen bg-black px-6 py-16 text-white md:px-10">
       <div className="mx-auto max-w-4xl">

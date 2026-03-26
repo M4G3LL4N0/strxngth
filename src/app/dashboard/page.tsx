@@ -1,6 +1,10 @@
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
+import { getCurrentUser } from "@/lib/supabase/actions";
+import { redirect } from "next/navigation";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const user = await getCurrentUser();
+  if (!user) redirect("/sign-in");
   return (
     <main className="min-h-screen bg-black px-6 py-12 text-white md:px-10">
       <div className="mx-auto max-w-6xl">

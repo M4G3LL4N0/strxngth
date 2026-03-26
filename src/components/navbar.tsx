@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { getCurrentUser } from "@/lib/supabase/actions";
 
-export function Navbar() {
+export async function Navbar() {
+  const user = await getCurrentUser();
   return (
     <nav className="sticky top-0 z-50 border-b border-white/5 bg-black/90 backdrop-blur-lg">
       <div className="container mx-auto flex h-20 items-center justify-between px-6">
@@ -22,9 +24,15 @@ export function Navbar() {
           </div>
         </div>
         <div className="flex items-center space-x-4">
-          <Link href="/dashboard" className="text-sm font-medium text-white/80 hover:text-white transition-all duration-200">
-            Login
-          </Link>
+          {user ? (
+            <Link href="/dashboard" className="text-sm font-medium text-white/80 hover:text-white transition-all duration-200">
+              Dashboard
+            </Link>
+          ) : (
+            <Link href="/sign-in" className="text-sm font-medium text-white/80 hover:text-white transition-all duration-200">
+              Sign in
+            </Link>
+          )}
           <Link href="/onboarding">
             <Button variant="primary" className="hidden sm:flex">
               Build Your Plan
