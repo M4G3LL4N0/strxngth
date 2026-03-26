@@ -1,31 +1,32 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/supabase/actions";
-import { supabase } from "@/lib/supabase/client";
+"use client"
 
-export default async function SignInPage({
-  searchParams,
-}: {
-  searchParams: { success?: string; error?: string };
-}) {
-  const user = await getCurrentUser();
-  if (user) redirect("/dashboard");
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { signInWithOtp } from '@/lib/supabase/actions'
 
-  async function handleSignIn(formData: FormData) {
-    "use server";
-    const email = formData.get("email") as string;
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/dashboard`,
-      },
-    });
+export default function SignInPage() {
+  const router = useRouter()
+  const [email, setEmail] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState(false)
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+    
+    const { error } = await signInWithOtp(email)
+    
     if (error) {
-      return redirect("/sign-in?error=" + encodeURIComponent(error.message));
+      setError(error.message)
+      setLoading(false)
+    } else {
+      setSuccess(true)
+      setLoading(false)
     }
-    return redirect("/sign-in?success=true");
   }
 
   return (
@@ -43,30 +44,35 @@ export default async function SignInPage({
           </p>
         </div>
 
-        {searchParams.success && (
+        {success && (
           <div className="mb-6 rounded-xl bg-green-900/50 p-4 text-green-400">
-            Check your email for a magic link!
+            Check your email for your sign-in link.
           </div>
         )}
 
-        {searchParams.error && (
+        {error && (
           <div className="mb-6 rounded-xl bg-red-900/50 p-4 text-red-400">
-            {searchParams.error}
+            {error}
           </div>
         )}
 
-        <form action={handleSignIn} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            name="email"
             type="email"
             placeholder="Email address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
-          <Button type="submit" className="w-full">
-            Continue with Email
+          <Button 
+            type="submit" 
+            className="w-full"
+            disabled={loading}
+          >
+            {loading ? 'Sending...' : 'Continue with Email'}
           </Button>
         </form>
       </div>
     </main>
-  );
+  )
 }

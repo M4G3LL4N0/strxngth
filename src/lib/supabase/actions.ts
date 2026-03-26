@@ -13,6 +13,53 @@ export async function getCurrentUser() {
   return user
 }
 
+export async function signInWithOtp(email: string) {
+  const supabase = getSupabaseBrowserClient()
+  const { data, error } = await supabase.auth.signInWithOtp({
+    email,
+    options: {
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/dashboard`
+    }
+  })
+  
+  return { data, error }
+}
+
+export async function syncLocalDataIfAuthenticated() {
+  const user = await getCurrentUser()
+  if (!user) return null
+  
+  const localPlan = localStorage.getItem('strxngth_plan')
+  const localProfile = localStorage.getItem('strxngth_profile')
+  
+  if (localPlan && localProfile) {
+    try {
+      const plan = JSON.parse(localPlan)
+      const profile = JSON.parse(localProfile)
+      
+      // Upsert profile first
+      await upsertProfile(profile)
+      
+      // Create plan if doesn't exist
+      const { data: existingPlan } = await getLatestPlan()
+      if (!existingPlan) {
+        await createPlan(plan)
+      }
+      
+      // Clear local storage
+      localStorage.removeItem('strxngth_plan')
+      localStorage.removeItem('strxngth_profile')
+      
+      return { success: true }
+    } catch (error) {
+      console.error('Error syncing local data:', error)
+      return { success: false, error }
+    }
+  }
+  
+  return null
+}
+
 export async function getProfile(): Promise<SyncResult> {
   const user = await getCurrentUser()
   if (!user) return { success: false }

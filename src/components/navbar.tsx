@@ -1,9 +1,28 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { getCurrentUser } from "@/lib/supabase/actions";
+"use client"
 
-export async function Navbar() {
-  const user = await getCurrentUser();
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { useEffect, useState } from "react"
+import { getCurrentUser, signOut } from "@/lib/supabase/actions"
+
+export function Navbar() {
+  const [user, setUser] = useState<any>(null)
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const user = await getCurrentUser()
+      setUser(user)
+    }
+    
+    checkAuth()
+  }, [])
+
+  const handleSignOut = async () => {
+    await signOut()
+    setUser(null)
+    window.location.href = '/'
+  }
+
   return (
     <nav className="sticky top-0 z-50 border-b border-white/5 bg-black/90 backdrop-blur-lg">
       <div className="container mx-auto flex h-20 items-center justify-between px-6">
@@ -39,12 +58,21 @@ export async function Navbar() {
         </div>
         <div className="flex items-center space-x-4">
           {user ? (
-            <Link
-              href="/dashboard"
-              className="text-sm font-medium text-white hover:text-white/80 transition-all duration-200"
-            >
-              Dashboard
-            </Link>
+            <>
+              <Link
+                href="/dashboard"
+                className="text-sm font-medium text-white hover:text-white/80 transition-all duration-200"
+              >
+                Dashboard
+              </Link>
+              <Button 
+                variant="ghost" 
+                onClick={handleSignOut}
+                className="text-sm"
+              >
+                Sign out
+              </Button>
+            </>
           ) : (
             <Link
               href="/sign-in"
@@ -61,5 +89,5 @@ export async function Navbar() {
         </div>
       </div>
     </nav>
-  );
+  )
 }

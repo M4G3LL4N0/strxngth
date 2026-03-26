@@ -12,9 +12,10 @@ export function getSupabaseBrowserClient() {
         db: { schema: 'strxngth' },
         auth: {
           flowType: 'pkce',
-          autoRefreshToken: false,
-          detectSessionInUrl: false,
-          persistSession: true
+          autoRefreshToken: true,
+          detectSessionInUrl: true,
+          persistSession: true,
+          storage: typeof window !== 'undefined' ? window.localStorage : undefined
         }
       }
     )
