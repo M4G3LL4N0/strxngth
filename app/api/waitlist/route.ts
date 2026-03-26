@@ -1,9 +1,10 @@
-import { supabase } from '@/lib/supabase';
-import { Database } from '@/types/database';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
+import type { Database } from '@/lib/database.types';
 
 export async function POST(request: Request) {
   const { email } = await request.json();
   
+  const supabase = createSupabaseServerClient();
   const { data, error } = await supabase
     .from('waitlist')
     .insert({ email })

@@ -1,4 +1,4 @@
-import { Nav } from "@/components/Nav";
+import { Navbar } from "@/components/navbar";
 
 export default function RootLayout({
   children,
@@ -8,7 +8,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-black text-white">
-        <Nav />
+        <Navbar />
         {children}
       </body>
     </html>
