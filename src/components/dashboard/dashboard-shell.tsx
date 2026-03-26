@@ -7,6 +7,7 @@ import { SummaryCards } from "@/components/dashboard/summary-cards";
 import { TodayPlan } from "@/components/dashboard/today-plan";
 import { NutritionPanel } from "@/components/dashboard/nutrition-panel";
 import { CoachPanel } from "@/components/dashboard/coach-panel";
+import { ProgressSection } from "@/components/dashboard/progress-section";
 
 export function DashboardShell() {
   const [plan, setPlan] = useState<GeneratedPlan>(mockPlan);
@@ -46,6 +47,8 @@ export function DashboardShell() {
           reminders={plan.reminders}
         />
       </div>
+
+      <ProgressSection />
     </div>
   );
 }
