@@ -72,9 +72,16 @@ export function OnboardingForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-5">
-      <div className="grid gap-5 md:grid-cols-2">
-        <Input placeholder="Name" value={form.name} onChange={(e) => update("name", e.target.value)} />
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="grid gap-4 md:grid-cols-2">
+        <div>
+          <label className="block text-xs text-white/60 mb-1">Full name</label>
+          <Input 
+            placeholder="Your name" 
+            value={form.name} 
+            onChange={(e) => update("name", e.target.value)} 
+          />
+        </div>
         <Input placeholder="Age" value={form.age} onChange={(e) => update("age", e.target.value)} />
         <Input placeholder="Sex" value={form.sex} onChange={(e) => update("sex", e.target.value)} />
         <Input placeholder='Height (example: 5"11 or 180 cm)' value={form.height} onChange={(e) => update("height", e.target.value)} />

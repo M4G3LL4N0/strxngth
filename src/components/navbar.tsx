@@ -24,14 +24,14 @@ export function Navbar() {
   }
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-white/5 bg-black/90 backdrop-blur-lg">
-      <div className="container mx-auto flex h-20 items-center justify-between px-6">
-        <div className="flex items-center space-x-12">
+    <nav className="sticky top-0 z-50 border-b border-white/5 bg-black/95 backdrop-blur-sm">
+      <div className="mx-auto flex h-16 items-center justify-between px-6 max-w-7xl">
+        <div className="flex items-center space-x-10">
           <Link
             href="/"
-            className="text-xl font-semibold tracking-tight text-white"
+            className="text-lg font-medium tracking-tight text-white"
           >
-            Strxngth
+            <span className="font-bold">STRENGTH</span>
           </Link>
           <div className="hidden items-center space-x-8 md:flex">
             <Link

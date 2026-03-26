@@ -6,15 +6,15 @@ export function Hero() {
     <section className="relative overflow-hidden px-6 py-40 md:px-10 md:py-48">
       <div className="container mx-auto grid grid-cols-1 gap-16 md:grid-cols-2">
         <div className="flex flex-col justify-center space-y-8">
-          <div className="inline-flex rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-white/80">
-            Elite Performance System
+          <div className="text-xs tracking-wider text-white/60 uppercase mb-2">
+            PERFORMANCE OPERATING SYSTEM
           </div>
-          <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl">
-            Precision training,<br />
-            built for <span className="text-white/90">real execution</span>.
+          <h1 className="text-4xl font-medium tracking-tight text-white sm:text-5xl md:text-5xl">
+            The system<br />
+            for <span className="font-bold">serious results</span>.
           </h1>
-          <p className="max-w-xl text-lg leading-8 text-white/80">
-            Strxngth combines AI-powered workout programming, precision nutrition, and behavioral accountability into one seamless system.
+          <p className="max-w-xl mt-4 text-white/70 leading-relaxed">
+            AI-structured training, precision nutrition, and daily execution - integrated.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
             <Link href="/onboarding">

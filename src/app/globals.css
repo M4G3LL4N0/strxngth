@@ -3,12 +3,12 @@
 :root {
   color-scheme: dark;
   --max-width: 1440px;
-  --border-radius: 20px;
-  --border-radius-sm: 14px;
-  --glass-bg: rgba(255, 255, 255, 0.08);
-  --glass-border: rgba(255, 255, 255, 0.2);
-  --transition: cubic-bezier(0.16, 1, 0.3, 1);
-  --elevation-1: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --border-radius: 12px;
+  --border-radius-sm: 8px;
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --transition: cubic-bezier(0.33, 1, 0.68, 1);
+  --elevation-1: 0 1px 3px rgba(0, 0, 0, 0.12);
   --elevation-2: 0 4px 6px rgba(0, 0, 0, 0.1);
   --elevation-3: 0 10px 15px rgba(0, 0, 0, 0.15);
 }
