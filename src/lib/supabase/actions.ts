@@ -1,202 +1,273 @@
-import { getSupabaseBrowserClient } from './client'
-import type { Database } from '@/lib/database.types'
-import type { OnboardingData, GeneratedPlan, SyncResult } from '@/lib/types'
+"use client";
 
-export async function getCurrentUser() {
-  const supabase = getSupabaseBrowserClient()
-  const { data: { user }, error } = await supabase.auth.getUser()
-  
-  if (error) {
-    console.error('Error getting user:', error)
-    return null
-  }
-  return user
+import type { User } from "@supabase/supabase-js";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import type { OnboardingData, GeneratedPlan } from "@/lib/types";
+
+type ActionResult<T> = {
+  data: T | null;
+  error: string | null;
+};
+
+type ProfileRow = {
+  id: string;
+  user_id: string;
+  name: string | null;
+  age: string | null;
+  sex: string | null;
+  height: string | null;
+  weight: string | null;
+  body_type: string | null;
+  goal: string | null;
+  activity_level: string | null;
+  diet_type: string | null;
+  allergies: string | null;
+  injuries: string | null;
+  workout_consistency: string | null;
+  workout_location: string | null;
+  available_days: string | null;
+  coaching_tone: string | null;
+  medical_notes: string | null;
+  supplements: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
+type PlanRow = {
+  id: string;
+  user_id: string;
+  profile_id: string | null;
+  summary: string | null;
+  workout_plan: GeneratedPlan["workoutPlan"];
+  nutrition_plan: GeneratedPlan["nutritionPlan"];
+  checklist: GeneratedPlan["checklist"];
+  reminders: GeneratedPlan["reminders"];
+  coach_message: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
+function mapProfileToRow(userId: string, profile: OnboardingData): Omit<ProfileRow, "id"> {
+  return {
+    user_id: userId,
+    name: profile.name,
+    age: profile.age,
+    sex: profile.sex,
+    height: profile.height,
+    weight: profile.weight,
+    body_type: profile.bodyType,
+    goal: profile.goal,
+    activity_level: profile.activityLevel,
+    diet_type: profile.dietType,
+    allergies: profile.allergies,
+    injuries: profile.injuries,
+    workout_consistency: profile.workoutConsistency,
+    workout_location: profile.workoutLocation,
+    available_days: profile.availableDays,
+    coaching_tone: profile.coachingTone,
+    medical_notes: profile.medicalNotes,
+    supplements: profile.supplements,
+  };
 }
 
-export async function signInWithOtp(email: string) {
-  const supabase = getSupabaseBrowserClient()
-  const { data, error } = await supabase.auth.signInWithOtp({
+function mapPlanToRow(
+  userId: string,
+  plan: GeneratedPlan,
+  profileId?: string | null,
+): Omit<PlanRow, "id"> {
+  return {
+    user_id: userId,
+    profile_id: profileId ?? null,
+    summary: plan.summary,
+    workout_plan: plan.workoutPlan,
+    nutrition_plan: plan.nutritionPlan,
+    checklist: plan.checklist,
+    reminders: plan.reminders,
+    coach_message: plan.coachMessage,
+  };
+}
+
+export async function getCurrentUser(): Promise<User | null> {
+  const supabase = getSupabaseBrowserClient();
+  const { data, error } = await supabase.auth.getUser();
+
+  if (error) {
+    console.error("getCurrentUser error:", error.message);
+    return null;
+  }
+
+  return data.user ?? null;
+}
+
+export async function signInWithOtp(email: string): Promise<ActionResult<boolean>> {
+  const supabase = getSupabaseBrowserClient();
+
+  const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/dashboard`
-    }
-  })
-  
-  return { data, error }
-}
-
-export async function syncLocalDataIfAuthenticated() {
-  const user = await getCurrentUser()
-  if (!user) return null
-  
-  const localPlan = localStorage.getItem('strxngth_plan')
-  const localProfile = localStorage.getItem('strxngth_profile')
-  
-  if (localPlan && localProfile) {
-    try {
-      const plan = JSON.parse(localPlan)
-      const profile = JSON.parse(localProfile)
-      
-      // Upsert profile first
-      await upsertProfile(profile)
-      
-      // Create plan if doesn't exist
-      const { data: existingPlan } = await getLatestPlan()
-      if (!existingPlan) {
-        await createPlan(plan)
-      }
-      
-      // Clear local storage
-      localStorage.removeItem('strxngth_plan')
-      localStorage.removeItem('strxngth_profile')
-      
-      return { success: true }
-    } catch (error) {
-      console.error('Error syncing local data:', error)
-      return { success: false, error }
-    }
-  }
-  
-  return null
-}
-
-export async function getProfile(): Promise<SyncResult> {
-  const user = await getCurrentUser()
-  if (!user) return { success: false }
-
-  const supabase = getSupabaseBrowserClient()
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('user_id', user.id)
-    .maybeSingle()
+      emailRedirectTo:
+        typeof window !== "undefined" ? `${window.location.origin}/dashboard` : undefined,
+    },
+  });
 
   if (error) {
-    console.error('Error getting profile:', error)
-    return { success: false, error: error.message }
+    return { data: null, error: error.message };
   }
 
-  return { success: true, profile: data }
+  return { data: true, error: null };
 }
 
-export async function upsertProfile(formData: OnboardingData): Promise<SyncResult> {
-  const user = await getCurrentUser()
-  if (!user) return { success: false }
-
-  const supabase = getSupabaseBrowserClient()
-  const { data, error } = await supabase
-    .from('profiles')
-    .upsert({
-      user_id: user.id,
-      name: formData.name,
-      age: formData.age,
-      sex: formData.sex,
-      height: formData.height,
-      weight: formData.weight,
-      body_type: formData.bodyType,
-      goal: formData.goal,
-      activity_level: formData.activityLevel,
-      diet_type: formData.dietType,
-      allergies: formData.allergies,
-      injuries: formData.injuries,
-      workout_consistency: formData.workoutConsistency,
-      workout_location: formData.workoutLocation,
-      available_days: formData.availableDays,
-      coaching_tone: formData.coachingTone,
-      medical_notes: formData.medicalNotes,
-      supplements: formData.supplements,
-      updated_at: new Date().toISOString()
-    })
-    .select()
-    .single()
-
-  if (error) {
-    console.error('Error upserting profile:', error)
-    return { success: false, error: error.message }
-  }
-
-  return { success: true, profile: data }
-}
-
-export async function signOut() {
+export async function signOut(): Promise<ActionResult<boolean>> {
+  const supabase = getSupabaseBrowserClient();
   const { error } = await supabase.auth.signOut();
+
   if (error) {
-    console.error("Error signing out:", error);
-    throw error;
+    return { data: null, error: error.message };
   }
+
+  return { data: true, error: null };
 }
 
-export async function getSession() {
-  const { data, error } = await supabase.auth.getSession();
+export async function getProfile(): Promise<ActionResult<ProfileRow>> {
+  const supabase = getSupabaseBrowserClient();
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return { data: null, error: null };
+  }
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("user_id", user.id)
+    .maybeSingle<ProfileRow>();
+
   if (error) {
-    console.error("Error getting session:", error);
-    throw error;
+    return { data: null, error: error.message };
   }
-  return data.session;
+
+  return { data, error: null };
 }
 
-export async function upsertProfile(profile: OnboardingData) {
-  const user = await getCurrentUser()
-  if (!user) throw new Error('Not authenticated')
+export async function upsertProfile(
+  profile: OnboardingData,
+): Promise<ActionResult<ProfileRow>> {
+  const supabase = getSupabaseBrowserClient();
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return { data: null, error: "Not authenticated" };
+  }
+
+  const payload = mapProfileToRow(user.id, profile);
 
   const { data, error } = await supabase
-    .from('profiles')
-    .upsert({
-      user_id: user.id,
-      ...profile,
-      updated_at: new Date().toISOString()
-    })
-    .select()
-    .single()
+    .from("profiles")
+    .upsert(payload, { onConflict: "user_id" })
+    .select("*")
+    .single<ProfileRow>();
 
-  return { data, error }
+  if (error) {
+    return { data: null, error: error.message };
+  }
+
+  return { data, error: null };
 }
 
-export async function createPlan(plan: GeneratedPlan) {
-  const user = await getCurrentUser()
-  if (!user) throw new Error('Not authenticated')
+export async function createPlan(
+  plan: GeneratedPlan,
+  profileId?: string | null,
+): Promise<ActionResult<PlanRow>> {
+  const supabase = getSupabaseBrowserClient();
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return { data: null, error: "Not authenticated" };
+  }
+
+  const payload = mapPlanToRow(user.id, plan, profileId);
 
   const { data, error } = await supabase
-    .from('plans')
-    .insert({
-      user_id: user.id,
-      name: 'Primary Plan',
-      summary: plan.summary,
-      workouts: plan.workoutPlan.split,
-      duration_weeks: 12, // Default duration
-      checklist: plan.checklist,
-      nutrition: plan.nutritionPlan
-    })
-    .select()
-    .single()
+    .from("plans")
+    .insert(payload)
+    .select("*")
+    .single<PlanRow>();
 
-  return { data, error }
+  if (error) {
+    return { data: null, error: error.message };
+  }
+
+  return { data, error: null };
 }
 
-export async function getLatestPlan() {
-  const user = await getCurrentUser()
-  if (!user) throw new Error('Not authenticated')
+export async function getLatestPlan(): Promise<ActionResult<PlanRow>> {
+  const supabase = getSupabaseBrowserClient();
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return { data: null, error: null };
+  }
 
   const { data, error } = await supabase
-    .from('plans')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
+    .from("plans")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false })
     .limit(1)
-    .single()
+    .maybeSingle<PlanRow>();
 
-  return { data, error }
+  if (error) {
+    return { data: null, error: error.message };
+  }
+
+  return { data, error: null };
 }
 
-export async function getProfile() {
-  const user = await getCurrentUser()
-  if (!user) throw new Error('Not authenticated')
+export async function syncLocalDataIfAuthenticated(): Promise<
+  ActionResult<{ profile: ProfileRow | null; plan: PlanRow | null }>
+> {
+  const user = await getCurrentUser();
 
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('user_id', user.id)
-    .maybeSingle()
+  if (!user) {
+    return { data: null, error: null };
+  }
 
-  return { data, error }
+  try {
+    const profileRaw =
+      typeof window !== "undefined" ? localStorage.getItem("strxngth_profile") : null;
+    const planRaw =
+      typeof window !== "undefined" ? localStorage.getItem("strxngth_plan") : null;
+
+    let savedProfile: ProfileRow | null = null;
+    let savedPlan: PlanRow | null = null;
+
+    if (profileRaw) {
+      const parsedProfile = JSON.parse(profileRaw) as OnboardingData;
+      const profileResult = await upsertProfile(parsedProfile);
+      if (profileResult.data) {
+        savedProfile = profileResult.data;
+      }
+    }
+
+    if (planRaw) {
+      const parsedPlan = JSON.parse(planRaw) as GeneratedPlan;
+      const planResult = await createPlan(parsedPlan, savedProfile?.id ?? null);
+      if (planResult.data) {
+        savedPlan = planResult.data;
+      }
+    }
+
+    return {
+      data: {
+        profile: savedProfile,
+        plan: savedPlan,
+      },
+      error: null,
+    };
+  } catch (error) {
+    return {
+      data: null,
+      error: error instanceof Error ? error.message : "Failed to sync local data",
+    };
+  }
 }

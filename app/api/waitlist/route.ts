@@ -1,29 +1,43 @@
-import { createSupabaseServerClient } from '@/lib/supabase/server';
-import type { Database } from '@/lib/database.types';
+import { NextResponse } from "next/server";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export async function POST(request: Request) {
-  const { email } = await request.json();
-  
-  const supabase = createSupabaseServerClient();
-  const { data, error } = await supabase
-    .from('waitlist')
-    .insert({ email })
-    .select()
-    .single();
+  try {
+    const body = await request.json();
+    const email =
+      typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
 
-  if (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json',
+    if (!email) {
+      return NextResponse.json(
+        { ok: false, error: "Email is required" },
+        { status: 400 }
+      );
+    }
+
+    const supabase = getSupabaseBrowserClient();
+
+    const waitlistTable = (supabase as any).from("waitlist");
+
+    const { data, error } = await waitlistTable
+      .insert([{ email }])
+      .select()
+      .single();
+
+    if (error) {
+      return NextResponse.json(
+        { ok: false, error: error.message },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ ok: true, data });
+  } catch (error) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: error instanceof Error ? error.message : "Unexpected error",
       },
-    });
+      { status: 500 }
+    );
   }
-
-  return new Response(JSON.stringify(data), {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
 }

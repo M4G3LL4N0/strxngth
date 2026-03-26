@@ -1,78 +1,107 @@
-"use client"
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { signInWithOtp } from '@/lib/supabase/actions'
+import { useState } from "react";
+import Link from "next/link";
+import { signInWithOtp } from "@/lib/supabase/actions";
 
 export default function SignInPage() {
-  const router = useRouter()
-  const [email, setEmail] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
-    
-    const { error } = await signInWithOtp(email)
-    
-    if (error) {
-      setError(error.message)
-      setLoading(false)
-    } else {
-      setSuccess(true)
-      setLoading(false)
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSuccess(false);
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!normalizedEmail) {
+      setError("Email is required.");
+      setLoading(false);
+      return;
     }
+
+    const result = await signInWithOtp(normalizedEmail);
+
+    if (result.error) {
+      setError(result.error);
+      setLoading(false);
+      return;
+    }
+
+    setSuccess(true);
+    setLoading(false);
   }
 
   return (
     <main className="min-h-screen bg-black px-6 py-16 text-white md:px-10">
       <div className="mx-auto max-w-md">
-        <div className="mb-10">
-          <div className="text-sm uppercase tracking-[0.2em] text-white/40">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur">
+          <p className="text-xs uppercase tracking-[0.24em] text-white/45">
             Strxngth
-          </div>
-          <h1 className="mt-4 text-4xl font-semibold md:text-6xl">
-            Welcome back.
-          </h1>
-          <p className="mt-4 text-white/70">
-            Enter your email to access your personalized system.
           </p>
+
+          <h1 className="mt-4 text-3xl font-semibold tracking-tight md:text-4xl">
+            Sign in
+          </h1>
+
+          <p className="mt-3 text-sm leading-6 text-white/65">
+            Enter your email and we’ll send you a secure sign-in link.
+          </p>
+
+          <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+            <div>
+              <label
+                htmlFor="email"
+                className="mb-2 block text-sm font-medium text-white/80"
+              >
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-white/30"
+              />
+            </div>
+
+            {error ? (
+              <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                {error}
+              </div>
+            ) : null}
+
+            {success ? (
+              <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80">
+                Check your email for your sign-in link.
+              </div>
+            ) : null}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-xl bg-white px-4 py-3 text-sm font-semibold text-black transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {loading ? "Sending link..." : "Send sign-in link"}
+            </button>
+          </form>
+
+          <div className="mt-6">
+            <Link
+              href="/"
+              className="text-sm text-white/60 transition hover:text-white"
+            >
+              Back to home
+            </Link>
+          </div>
         </div>
-
-        {success && (
-          <div className="mb-6 rounded-xl bg-green-900/50 p-4 text-green-400">
-            Check your email for your sign-in link.
-          </div>
-        )}
-
-        {error && (
-          <div className="mb-6 rounded-xl bg-red-900/50 p-4 text-red-400">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            type="email"
-            placeholder="Email address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <Button 
-            type="submit" 
-            className="w-full"
-            disabled={loading}
-          >
-            {loading ? 'Sending...' : 'Continue with Email'}
-          </Button>
-        </form>
       </div>
     </main>
-  )
+  );
 }
