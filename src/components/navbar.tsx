@@ -8,28 +8,48 @@ export async function Navbar() {
     <nav className="sticky top-0 z-50 border-b border-white/5 bg-black/90 backdrop-blur-lg">
       <div className="container mx-auto flex h-20 items-center justify-between px-6">
         <div className="flex items-center space-x-12">
-          <Link href="/" className="text-xl font-semibold tracking-tight text-white">
+          <Link
+            href="/"
+            className="text-xl font-semibold tracking-tight text-white"
+          >
             Strxngth
           </Link>
           <div className="hidden items-center space-x-8 md:flex">
-            <Link href="/#features" className="text-sm font-medium text-white/80 hover:text-white transition-all duration-200">
+            <Link
+              href="/#features"
+              className="text-sm font-medium text-white/80 hover:text-white transition-all duration-200"
+            >
               System
             </Link>
-            <Link href="/#how-it-works" className="text-sm font-medium text-white/80 hover:text-white transition-all duration-200">
+            <Link
+              href="/#how-it-works"
+              className="text-sm font-medium text-white/80 hover:text-white transition-all duration-200"
+            >
               How It Works
             </Link>
-            <Link href="/dashboard" className="text-sm font-medium text-white/80 hover:text-white transition-all duration-200">
-              Dashboard
-            </Link>
+            {user && (
+              <Link
+                href="/dashboard"
+                className="text-sm font-medium text-white/80 hover:text-white transition-all duration-200"
+              >
+                Dashboard
+              </Link>
+            )}
           </div>
         </div>
         <div className="flex items-center space-x-4">
           {user ? (
-            <Link href="/dashboard" className="text-sm font-medium text-white/80 hover:text-white transition-all duration-200">
+            <Link
+              href="/dashboard"
+              className="text-sm font-medium text-white hover:text-white/80 transition-all duration-200"
+            >
               Dashboard
             </Link>
           ) : (
-            <Link href="/sign-in" className="text-sm font-medium text-white/80 hover:text-white transition-all duration-200">
+            <Link
+              href="/sign-in"
+              className="text-sm font-medium text-white/80 hover:text-white transition-all duration-200"
+            >
               Sign in
             </Link>
           )}
