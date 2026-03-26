@@ -26,7 +26,7 @@ export function FeatureGrid() {
         <div className="grid gap-6 md:grid-cols-2">
           {features.map((feature) => (
             <Card key={feature.title} className="p-6">
-              <h3 className="text-xl font-semibold text-white">{feature.title}</h3>
+              <h3 className="text-lg font-semibold text-white">{feature.title}</h3>
               <p className="mt-3 text-white/70">{feature.text}</p>
             </Card>
           ))}

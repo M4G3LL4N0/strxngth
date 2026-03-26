@@ -10,7 +10,7 @@ import { CoachPanel } from "@/components/dashboard/coach-panel";
 import { ProgressSection } from "@/components/dashboard/progress-section";
 
 export function DashboardShell() {
-  const [plan, setPlan] = useState<GeneratedPlan>(mockPlan);
+  const [plan, setPlan] = useState<GeneratedPlan | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("strxngth_plan");
@@ -21,8 +21,24 @@ export function DashboardShell() {
     }
   }, []);
 
+  if (!plan) {
+    return (
+      <div className="space-y-6">
+        <div className="grid gap-4 md:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i} className="p-5">
+              <div className="h-6 w-24 animate-pulse rounded bg-white/10" />
+              <div className="mt-3 h-8 w-16 animate-pulse rounded bg-white/10" />
+            </Card>
+          ))}
+        </div>
+        {/* Add more skeleton loading states */}
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <SummaryCards
         calories={plan.nutritionPlan.calories}
         protein={plan.nutritionPlan.protein}

@@ -9,7 +9,7 @@ export function Hero() {
           <div className="inline-flex rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-white/80">
             Elite Performance System
           </div>
-          <h1 className="text-5xl font-semibold tracking-tight text-white md:text-6xl lg:text-7xl">
+          <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl">
             Precision training,<br />
             built for <span className="text-white/90">real execution</span>.
           </h1>
