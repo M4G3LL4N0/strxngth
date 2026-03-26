@@ -60,3 +60,16 @@ export interface GeneratedPlan {
   reminders: string[];
   coachMessage: string;
 }
+
+export interface DbPlan {
+  id: string;
+  user_id: string;
+  name: string;
+  summary: string;
+  workouts: string[];
+  duration_weeks: number;
+  checklist: string[];
+  nutrition: object;
+  created_at: string;
+  updated_at: string;
+}
