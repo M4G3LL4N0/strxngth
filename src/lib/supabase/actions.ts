@@ -1,18 +1,74 @@
-import { supabase } from './client'
-import type { OnboardingData, GeneratedPlan } from '@/lib/types'
+import { getSupabaseBrowserClient } from './client'
+import type { Database } from '@/lib/database.types'
+import type { OnboardingData, GeneratedPlan, SyncResult } from '@/lib/types'
 
 export async function getCurrentUser() {
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
+  const supabase = getSupabaseBrowserClient()
+  const { data: { user }, error } = await supabase.auth.getUser()
+  
+  if (error) {
+    console.error('Error getting user:', error)
+    return null
+  }
+  return user
+}
+
+export async function getProfile(): Promise<SyncResult> {
+  const user = await getCurrentUser()
+  if (!user) return { success: false }
+
+  const supabase = getSupabaseBrowserClient()
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('user_id', user.id)
+    .maybeSingle()
 
   if (error) {
-    console.error("Error getting user:", error);
-    return null;
+    console.error('Error getting profile:', error)
+    return { success: false, error: error.message }
   }
 
-  return user;
+  return { success: true, profile: data }
+}
+
+export async function upsertProfile(formData: OnboardingData): Promise<SyncResult> {
+  const user = await getCurrentUser()
+  if (!user) return { success: false }
+
+  const supabase = getSupabaseBrowserClient()
+  const { data, error } = await supabase
+    .from('profiles')
+    .upsert({
+      user_id: user.id,
+      name: formData.name,
+      age: formData.age,
+      sex: formData.sex,
+      height: formData.height,
+      weight: formData.weight,
+      body_type: formData.bodyType,
+      goal: formData.goal,
+      activity_level: formData.activityLevel,
+      diet_type: formData.dietType,
+      allergies: formData.allergies,
+      injuries: formData.injuries,
+      workout_consistency: formData.workoutConsistency,
+      workout_location: formData.workoutLocation,
+      available_days: formData.availableDays,
+      coaching_tone: formData.coachingTone,
+      medical_notes: formData.medicalNotes,
+      supplements: formData.supplements,
+      updated_at: new Date().toISOString()
+    })
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error upserting profile:', error)
+    return { success: false, error: error.message }
+  }
+
+  return { success: true, profile: data }
 }
 
 export async function signOut() {
