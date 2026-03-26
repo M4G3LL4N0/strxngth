@@ -30,10 +30,23 @@ export interface Database {
       user_id: string
       profile_id: string | null
       summary: string
-      workout_plan: object
-      nutrition_plan: object
-      checklist: object
-      reminders: object
+      workout_plan: {
+        title: string
+        frequency: string
+        split: string[]
+        notes: string[]
+      }
+      nutrition_plan: {
+        calories: string
+        protein: string
+        carbs: string
+        fats: string
+        hydration: string
+        mealTiming: string[]
+        notes: string[]
+      }
+      checklist: string[]
+      reminders: string[]
       coach_message: string
       created_at: string
       updated_at: string
@@ -42,3 +55,5 @@ export interface Database {
 }
 
 export type SupabaseClientType = SupabaseClient<Database>
+export type ProfileRecord = Database['strxngth']['profiles']
+export type PlanRecord = Database['strxngth']['plans']

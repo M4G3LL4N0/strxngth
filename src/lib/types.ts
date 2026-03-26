@@ -61,26 +61,15 @@ export interface GeneratedPlan {
   coachMessage: string;
 }
 
-export interface DbPlan {
-  id: string;
-  user_id: string;
-  profile_id: string | null;
-  summary: string;
-  workout_plan: object;
-  nutrition_plan: object;
-  checklist: object;
-  reminders: object;
-  coach_message: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export type ProfileRecord = Database['strxngth']['profiles']
-export type PlanRecord = Database['strxngth']['plans']
-
 export interface SyncResult {
   success: boolean
   error?: string
   profile?: ProfileRecord
   plan?: PlanRecord
+}
+
+export interface LocalStoragePlan {
+  plan: GeneratedPlan
+  profile: OnboardingData
+  timestamp: string
 }
