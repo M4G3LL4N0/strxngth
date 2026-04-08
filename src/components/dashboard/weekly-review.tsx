@@ -24,6 +24,17 @@ interface FocusArea {
   action: string;
 }
 
+const Progress: React.FC<ProgressProps> = ({ value, max, className }) => {
+  return (
+    <div className={className}>
+      <div 
+        className="h-2 bg-white/10 rounded-full"
+        style={{ width: `${(value / max) * 100}%` }}
+      />
+    </div>
+  );
+};
+
 const metrics: Metric[] = [
   { 
     name: "Training", 
