@@ -4,6 +4,10 @@ import { FeatureGrid } from "@/components/home/feature-grid";
 import { HowItWorks } from "@/components/home/how-it-works";
 import { CTA } from "@/components/home/cta";
 
+export const dynamic = 'force-static'
+
+export const dynamic = 'force-dynamic'
+
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-black text-white">

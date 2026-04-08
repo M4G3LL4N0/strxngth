@@ -1,6 +1,11 @@
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { WeeklyReview } from "@/components/dashboard/weekly-review";
 
+export const dynamic = 'force-static'
+export const revalidate = 3600 // revalidate at most every hour
+
+export const dynamic = 'force-dynamic'
+
 export default function DashboardPage() {
   return (
     <main className="min-h-screen bg-black px-6 py-12 text-white md:px-10">
