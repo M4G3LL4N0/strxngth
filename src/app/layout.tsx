@@ -28,8 +28,6 @@ export const metadata: Metadata = {
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { Toaster } from "@/components/toaster";
-import { Footer } from "@/components/footer";
-import { Toaster } from "@/components/toaster";
 
 export default function RootLayout({
   children,
