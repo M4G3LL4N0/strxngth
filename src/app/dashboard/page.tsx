@@ -1,4 +1,5 @@
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
+import { WeeklyReview } from "@/components/dashboard/weekly-review";
 
 export default function DashboardPage() {
   return (
@@ -17,6 +18,8 @@ export default function DashboardPage() {
         </div>
 
         <DashboardShell />
+        
+        <WeeklyReview />
       </div>
     </main>
   );
