@@ -2,6 +2,12 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 
+interface ProgressProps {
+  value: number;
+  max: number;
+  className?: string;
+}
+
 interface Metric {
   name: string;
   value: number;
