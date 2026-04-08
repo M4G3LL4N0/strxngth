@@ -2,12 +2,6 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 
-interface ProgressProps {
-  value: number;
-  max: number;
-  className?: string;
-}
-
 interface Metric {
   name: string;
   value: number;
@@ -17,23 +11,11 @@ interface Metric {
   unit?: string;
 }
 
-
 interface FocusArea {
   category: string;
   focus: string;
   action: string;
 }
-
-const Progress: React.FC<ProgressProps> = ({ value, max, className }) => {
-  return (
-    <div className={className}>
-      <div 
-        className="h-2 bg-white/10 rounded-full"
-        style={{ width: `${(value / max) * 100}%` }}
-      />
-    </div>
-  );
-};
 
 const metrics: Metric[] = [
   { 
@@ -104,11 +86,12 @@ export function WeeklyReview() {
                     {metric.value}% ({metric.value >= metric.target ? '✓' : '↓'})
                   </span>
                 </div>
-                <Progress 
-                  value={metric.value} 
-                  max={100}
-                  className="h-2"
-                />
+                <div className="h-2 bg-white/10 rounded-full">
+                  <Progress 
+                    value={metric.value} 
+                    className="h-full bg-white/80"
+                  />
+                </div>
                 <div className="relative mt-1">
                   <div 
                     className="absolute top-0 h-0.5 bg-white/30"
