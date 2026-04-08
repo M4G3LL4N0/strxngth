@@ -86,7 +86,7 @@ export default function SignInPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-xl bg-white px-4 py-3 text-sm font-semibold text-black transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-xl bg-white px-4 py-3 text-sm font-semibold text-black transition hover:bg-white/95 active:bg-white/90 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? "Sending link..." : "Send sign-in link"}
             </button>
