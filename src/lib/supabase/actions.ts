@@ -9,7 +9,7 @@ type ActionResult<T> = {
   error: string | null;
 };
 
-type ProfileRow = {
+export type ProfileRow = {
   id: string;
   user_id: string;
   name: string | null;
@@ -33,7 +33,7 @@ type ProfileRow = {
   updated_at?: string;
 };
 
-type PlanRow = {
+export type PlanRow = {
   id: string;
   user_id: string;
   profile_id: string | null;
@@ -136,17 +136,18 @@ export async function getProfile(): Promise<ActionResult<ProfileRow>> {
     return { data: null, error: null };
   }
 
-  const { data, error } = await supabase
-    .from("profiles")
+  const profilesTable = (supabase as any).from("profiles");
+
+  const { data, error } = await profilesTable
     .select("*")
     .eq("user_id", user.id)
-    .maybeSingle<ProfileRow>();
+    .maybeSingle();
 
   if (error) {
     return { data: null, error: error.message };
   }
 
-  return { data, error: null };
+  return { data: (data as ProfileRow | null) ?? null, error: null };
 }
 
 export async function upsertProfile(
@@ -160,18 +161,18 @@ export async function upsertProfile(
   }
 
   const payload = mapProfileToRow(user.id, profile);
+  const profilesTable = (supabase as any).from("profiles");
 
-  const { data, error } = await supabase
-    .from("profiles")
-    .upsert(payload, { onConflict: "user_id" })
+  const { data, error } = await profilesTable
+    .upsert([payload], { onConflict: "user_id" })
     .select("*")
-    .single<ProfileRow>();
+    .single();
 
   if (error) {
     return { data: null, error: error.message };
   }
 
-  return { data, error: null };
+  return { data: data as ProfileRow, error: null };
 }
 
 export async function createPlan(
@@ -186,18 +187,18 @@ export async function createPlan(
   }
 
   const payload = mapPlanToRow(user.id, plan, profileId);
+  const plansTable = (supabase as any).from("plans");
 
-  const { data, error } = await supabase
-    .from("plans")
-    .insert(payload)
+  const { data, error } = await plansTable
+    .insert([payload])
     .select("*")
-    .single<PlanRow>();
+    .single();
 
   if (error) {
     return { data: null, error: error.message };
   }
 
-  return { data, error: null };
+  return { data: data as PlanRow, error: null };
 }
 
 export async function getLatestPlan(): Promise<ActionResult<PlanRow>> {
@@ -208,19 +209,20 @@ export async function getLatestPlan(): Promise<ActionResult<PlanRow>> {
     return { data: null, error: null };
   }
 
-  const { data, error } = await supabase
-    .from("plans")
+  const plansTable = (supabase as any).from("plans");
+
+  const { data, error } = await plansTable
     .select("*")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
     .limit(1)
-    .maybeSingle<PlanRow>();
+    .maybeSingle();
 
   if (error) {
     return { data: null, error: error.message };
   }
 
-  return { data, error: null };
+  return { data: (data as PlanRow | null) ?? null, error: null };
 }
 
 export async function syncLocalDataIfAuthenticated(): Promise<

@@ -1,86 +1,121 @@
-import { supabase } from './client'
-import { Profile, Plan, UserSession } from './types'
+"use client";
 
-export async function initializeUser(): Promise<string> {
-  const userId = crypto.randomUUID()
-  const { data, error } = await supabase
-    .from('user_sessions')
-    .insert({ id: userId })
-    .select()
-    .single()
+import { getSupabaseBrowserClient } from "./client";
 
-  if (error) console.error('Error initializing user:', error)
-  return userId
+export type Profile = {
+  id: string;
+  user_id: string;
+  name: string | null;
+  age: string | null;
+  sex: string | null;
+  height: string | null;
+  weight: string | null;
+  body_type: string | null;
+  goal: string | null;
+  activity_level: string | null;
+  diet_type: string | null;
+  allergies: string | null;
+  injuries: string | null;
+  workout_consistency: string | null;
+  workout_location: string | null;
+  available_days: string | null;
+  coaching_tone: string | null;
+  medical_notes: string | null;
+  supplements: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type Plan = {
+  id: string;
+  user_id: string;
+  profile_id: string | null;
+  summary: string | null;
+  workout_plan: unknown;
+  nutrition_plan: unknown;
+  checklist: unknown;
+  reminders: unknown;
+  coach_message: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type UserSession = {
+  userId: string | null;
+  email: string | null;
+};
+
+export async function initializeUser(): Promise<string | null> {
+  const supabase = getSupabaseBrowserClient();
+  const { data, error } = await supabase.auth.getUser();
+
+  if (error) {
+    console.error("initializeUser error:", error.message);
+    return null;
+  }
+
+  return data.user?.id ?? null;
 }
 
-export async function saveProfile(profile: Omit<Profile, 'id'|'created_at'|'updated_at'>) {
-  const { data, error } = await supabase
-    .from('profiles')
-    .insert(profile)
-    .select()
-    .single()
+export async function getUserSession(): Promise<UserSession> {
+  const supabase = getSupabaseBrowserClient();
+  const { data, error } = await supabase.auth.getUser();
 
-  if (error) console.error('Error saving profile:', error)
-  return data
+  if (error || !data.user) {
+    return {
+      userId: null,
+      email: null,
+    };
+  }
+
+  return {
+    userId: data.user.id,
+    email: data.user.email ?? null,
+  };
 }
 
-export async function savePlan(plan: Omit<Plan, 'id'|'created_at'|'updated_at'>) {
-  const { data, error } = await supabase
-    .from('plans')
-    .insert(plan)
-    .select()
-    .single()
+export async function getProfile(): Promise<Profile | null> {
+  const supabase = getSupabaseBrowserClient();
+  const { data: userData, error: userError } = await supabase.auth.getUser();
 
-  if (error) console.error('Error saving plan:', error)
-  return data
+  if (userError || !userData.user) {
+    return null;
+  }
+
+  const table = (supabase as any).from("profiles");
+  const { data, error } = await table
+    .select("*")
+    .eq("user_id", userData.user.id)
+    .maybeSingle();
+
+  if (error) {
+    console.error("getProfile error:", error.message);
+    return null;
+  }
+
+  return (data as Profile | null) ?? null;
 }
 
-export async function getLatestPlan(userId: string): Promise<Plan | null> {
-  const { data, error } = await supabase
-    .from('plans')
-    .select('*')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
+export async function getLatestPlan(): Promise<Plan | null> {
+  const supabase = getSupabaseBrowserClient();
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+
+  if (userError || !userData.user) {
+    return null;
+  }
+
+  const table = (supabase as any).from("plans");
+  const { data, error } = await table
+    .select("*")
+    .eq("user_id", userData.user.id)
+    .order("created_at", { ascending: false })
     .limit(1)
-    .single()
+    .maybeSingle();
 
   if (error) {
-    console.error('Error getting plan:', error)
-    return null
+    console.error("getLatestPlan error:", error.message);
+    return null;
   }
-  return data
-}
 
-export async function signInWithEmail(email: string, password?: string) {
-  const { data, error } = password
-    ? await supabase.auth.signInWithPassword({ email, password })
-    : await supabase.auth.signInWithOtp({ email })
-
-  if (error) throw error
-  return data
-}
-
-export async function signOut() {
-  const { error } = await supabase.auth.signOut()
-  if (error) throw error
-}
-
-export async function getSession() {
-  const { data, error } = await supabase.auth.getSession()
-  if (error) throw error
-  return data.session
-}
-
-export async function getUserProfile(userId: string): Promise<Profile | null> {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('user_id', userId)
-    .single()
-
-  if (error) {
-    console.error('Error getting profile:', error)
-    return null
-  }
-  return data
+  return (data as Plan | null) ?? null;
 }

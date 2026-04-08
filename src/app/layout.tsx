@@ -39,9 +39,7 @@ export default function RootLayout({
       <body className="bg-black text-white antialiased">
         <Navbar />
         <main className="min-h-screen pb-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            {children}
-          </div>
+          {children}
         </main>
         <Footer />
         <Toaster />

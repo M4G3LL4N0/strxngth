@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import type { OnboardingData } from "@/lib/types";
+import { upsertProfile, createPlan } from "@/lib/supabase/actions";
+import type { OnboardingData, GeneratedPlan } from "@/lib/types";
 
 const initialState: OnboardingData = {
   name: "",
@@ -37,6 +38,25 @@ export function OnboardingForm() {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
+  async function persistPlan(plan: GeneratedPlan) {
+    try {
+      const profileResult = await upsertProfile(form);
+      const profileId = profileResult.data?.id ?? null;
+
+      const planResult = await createPlan(plan, profileId);
+
+      if (profileResult.error) {
+        console.error("Profile save error:", profileResult.error);
+      }
+
+      if (planResult.error) {
+        console.error("Plan save error:", planResult.error);
+      }
+    } catch (error) {
+      console.error("Persist error:", error);
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -51,50 +71,64 @@ export function OnboardingForm() {
       const data = await res.json();
 
       if (data?.plan) {
-        localStorage.setItem("strxngth_plan", JSON.stringify(data.plan));
+        const plan = data.plan as GeneratedPlan;
+
+        localStorage.setItem("strxngth_plan", JSON.stringify(plan));
         localStorage.setItem("strxngth_profile", JSON.stringify(form));
-        await toast.promise(
-          saveProfile(form),
-          {
-            loading: 'Saving your profile...',
-            success: 'Profile saved successfully',
-            error: 'Error saving profile',
-          }
-        );
-        router.push("/dashboard?new_plan=true");
+
+        await persistPlan(plan);
       }
     } catch (error) {
-      console.error(error);
-      router.push("/dashboard");
+      console.error("Onboarding submit error:", error);
     } finally {
       setLoading(false);
+      router.push("/dashboard");
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-2">
-        <div>
-          <label className="block text-xs text-white/60 mb-1">Full name</label>
-          <Input 
-            placeholder="Your name" 
-            value={form.name} 
-            onChange={(e) => update("name", e.target.value)} 
-          />
-        </div>
-        <Input placeholder="Age" value={form.age} onChange={(e) => update("age", e.target.value)} />
-        <Input placeholder="Sex" value={form.sex} onChange={(e) => update("sex", e.target.value)} />
-        <Input placeholder='Height (example: 5"11 or 180 cm)' value={form.height} onChange={(e) => update("height", e.target.value)} />
-        <Input placeholder="Weight" value={form.weight} onChange={(e) => update("weight", e.target.value)} />
+    <form onSubmit={handleSubmit} className="grid gap-5">
+      <div className="grid gap-5 md:grid-cols-2">
+        <Input
+          placeholder="Name"
+          value={form.name}
+          onChange={(e) => update("name", e.target.value)}
+        />
+        <Input
+          placeholder="Age"
+          value={form.age}
+          onChange={(e) => update("age", e.target.value)}
+        />
+        <Input
+          placeholder="Sex"
+          value={form.sex}
+          onChange={(e) => update("sex", e.target.value)}
+        />
+        <Input
+          placeholder='Height (example: 5"11 or 180 cm)'
+          value={form.height}
+          onChange={(e) => update("height", e.target.value)}
+        />
+        <Input
+          placeholder="Weight"
+          value={form.weight}
+          onChange={(e) => update("weight", e.target.value)}
+        />
 
-        <Select value={form.bodyType} onChange={(e) => update("bodyType", e.target.value as OnboardingData["bodyType"])}>
+        <Select
+          value={form.bodyType}
+          onChange={(e) => update("bodyType", e.target.value as OnboardingData["bodyType"])}
+        >
           <option value="unsure">Body type: Unsure</option>
           <option value="ectomorph">Ectomorph</option>
           <option value="mesomorph">Mesomorph</option>
           <option value="endomorph">Endomorph</option>
         </Select>
 
-        <Select value={form.goal} onChange={(e) => update("goal", e.target.value as OnboardingData["goal"])}>
+        <Select
+          value={form.goal}
+          onChange={(e) => update("goal", e.target.value as OnboardingData["goal"])}
+        >
           <option value="fat_loss">Fat loss</option>
           <option value="muscle_gain">Muscle gain</option>
           <option value="recomposition">Recomposition</option>
@@ -103,13 +137,21 @@ export function OnboardingForm() {
           <option value="general_health">General health</option>
         </Select>
 
-        <Select value={form.activityLevel} onChange={(e) => update("activityLevel", e.target.value as OnboardingData["activityLevel"])}>
+        <Select
+          value={form.activityLevel}
+          onChange={(e) =>
+            update("activityLevel", e.target.value as OnboardingData["activityLevel"])
+          }
+        >
           <option value="low">Low activity</option>
           <option value="moderate">Moderate activity</option>
           <option value="high">High activity</option>
         </Select>
 
-        <Select value={form.dietType} onChange={(e) => update("dietType", e.target.value as OnboardingData["dietType"])}>
+        <Select
+          value={form.dietType}
+          onChange={(e) => update("dietType", e.target.value as OnboardingData["dietType"])}
+        >
           <option value="anything">Anything</option>
           <option value="high_protein">High protein</option>
           <option value="keto">Keto</option>
@@ -119,13 +161,23 @@ export function OnboardingForm() {
           <option value="vegan">Vegan</option>
         </Select>
 
-        <Select value={form.workoutLocation} onChange={(e) => update("workoutLocation", e.target.value as OnboardingData["workoutLocation"])}>
+        <Select
+          value={form.workoutLocation}
+          onChange={(e) =>
+            update("workoutLocation", e.target.value as OnboardingData["workoutLocation"])
+          }
+        >
           <option value="gym">Gym</option>
           <option value="home">Home</option>
           <option value="both">Both</option>
         </Select>
 
-        <Select value={form.coachingTone} onChange={(e) => update("coachingTone", e.target.value as OnboardingData["coachingTone"])}>
+        <Select
+          value={form.coachingTone}
+          onChange={(e) =>
+            update("coachingTone", e.target.value as OnboardingData["coachingTone"])
+          }
+        >
           <option value="elite_coach">Elite coach</option>
           <option value="balanced">Balanced</option>
           <option value="supportive">Supportive</option>
@@ -138,28 +190,33 @@ export function OnboardingForm() {
         value={form.availableDays}
         onChange={(e) => update("availableDays", e.target.value)}
       />
+
       <Input
         placeholder="Current workout consistency issues"
         value={form.workoutConsistency}
         onChange={(e) => update("workoutConsistency", e.target.value)}
       />
+
       <Input
         placeholder="Current supplements"
         value={form.supplements}
         onChange={(e) => update("supplements", e.target.value)}
       />
+
       <Textarea
         placeholder="Allergies"
         value={form.allergies}
         onChange={(e) => update("allergies", e.target.value)}
         rows={3}
       />
+
       <Textarea
         placeholder="Injuries or movement limitations"
         value={form.injuries}
         onChange={(e) => update("injuries", e.target.value)}
         rows={3}
       />
+
       <Textarea
         placeholder="Medical notes or other context"
         value={form.medicalNotes}
