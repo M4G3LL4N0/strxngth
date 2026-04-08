@@ -68,6 +68,12 @@ a {
   border: 1px solid var(--glass-border);
   backdrop-filter: blur(10px);
   border-radius: var(--border-radius);
+  transition: transform 0.2s var(--transition), box-shadow 0.2s var(--transition);
+}
+
+.glass-panel:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--elevation-2);
 }
 
 .sticky-nav {
