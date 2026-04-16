@@ -1,10 +1,8 @@
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { WeeklyReview } from "@/components/dashboard/weekly-review";
 
-export const dynamic = 'force-static'
-export const revalidate = 3600 // revalidate at most every hour
-
 export const dynamic = 'force-dynamic'
+export const revalidate = 3600 // revalidate at most every hour
 
 export default function DashboardPage() {
   return (
