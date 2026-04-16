@@ -2,7 +2,7 @@ import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { WeeklyReview } from "@/components/dashboard/weekly-review";
 
 export const dynamic = 'force-dynamic'
-export const revalidate = 3600 // revalidate at most every hour
+// Revalidation is not needed when using dynamic rendering
 
 export default function DashboardPage() {
   return (
